@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.4;
 
 import "./IJuniorNFT.sol";
 import "erc721a/contracts/ERC721A.sol";
@@ -26,7 +26,7 @@ contract JuniorNFT is IJuniorNFT, ERC721A, Ownable, ReentrancyGuard {
 
     modifier onlyOwnerOrAdmin() {
         if (Admin == address(0)) revert BadRequest("Not allowed address");
-        if(_msgSender() != Admin || _msgSender() != owner()) revert NotOwnerNorAdmin("caller is not the Admin");
+        if(msg.sender != Admin && msg.sender != owner()) revert NotOwnerNorAdmin("caller is not the Admin");
         _;
     }
 
@@ -76,10 +76,10 @@ contract JuniorNFT is IJuniorNFT, ERC721A, Ownable, ReentrancyGuard {
     }
 
     function setBaseURI(string memory _newBaseURI) external onlyOwner {
-    if (isPermanent) revert ImmutableState();
-    
-    baseURI = _newBaseURI;
-    emit BaseURIUpdated(_newBaseURI);
+        if (isPermanent) revert ImmutableState();
+        
+        baseURI = _newBaseURI;
+        emit BaseURIUpdated(_newBaseURI);
     }
 
     function setDefaultURI(string memory _defaultURI)
@@ -93,6 +93,10 @@ contract JuniorNFT is IJuniorNFT, ERC721A, Ownable, ReentrancyGuard {
     function setMintingFee(uint256 fee) public onlyOwnerOrAdmin {
         mintingFee = fee;
         emit MintingFeeUpdated();
+    }
+
+    function getMinintgFee() public view returns(uint256) {
+        return mintingFee;
     }
 
     // function setReveal() public {
@@ -121,7 +125,7 @@ contract JuniorNFT is IJuniorNFT, ERC721A, Ownable, ReentrancyGuard {
         return address(this).balance;
     }
 
-    function withdraw() external payable onlyOwner {
+    function withdraw() external payable onlyOwner nonReentrant {
         uint256 amount = address(this).balance;
         (bool success, ) = _msgSender().call{value: amount}("");
         if (!success) {

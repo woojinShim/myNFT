@@ -2,14 +2,27 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("JuniorNFT", function () {
-  it("deploy", async function () {
-    const JuniorNFT = await ethers.getContractFactory("JuniorNFT");
-    const contract = await JuniorNFT.deploy(
-      "http://baseURI",
-      "http://defaultURI"
-    );
-    await contract.deployed();
+  let JuniorNFT, contract, addr;
 
-    console.log("JuniorNFT deployed to:", contract.address);
+  beforeEach(async () => {
+    [...addr] = await ethers.getSigners();
+    JuniorNFT = await ethers.getContractFactory("JuniorNFT");
+    contract = await JuniorNFT.deploy("http://baseURI", "http://defaultURI");
+    await contract.deployed();
+  });
+  describe("function test", () => {
+    it("should function act", async () => {
+      await contract.addAdmin(addr[1].address);
+      console.log(await contract.Admin());
+      console.log(addr[1].address);
+    });
+
+    it("should mint", async () => {
+      await contract.addAdmin(addr[1].address);
+      await contract.connect(addr[1]).adminMint(3);
+      console.log(await contract.tokenURI(2));
+      console.log(await contract.setBaseURI("asdf"));
+      console.log(await contract.withdraw());
+    });
   });
 });
