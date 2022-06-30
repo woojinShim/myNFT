@@ -72,6 +72,8 @@ contract JuniorNFT is IJuniorNFT, ERC721A, Ownable, ReentrancyGuard {
     }
 
     function setBaseURI(string memory _newBaseURI) external onlyOwnerOrAdmin {
+        if (isPermanent) revert ImmutableState();
+        
         baseURI = _newBaseURI;
         emit BaseURIUpdated(_newBaseURI);
     }
@@ -91,6 +93,10 @@ contract JuniorNFT is IJuniorNFT, ERC721A, Ownable, ReentrancyGuard {
 
     function getMinintgFee() public view returns(uint256) {
         return mintingFee;
+    }
+
+    function setPermanent() external onlyOwnerOrAdmin {
+        isPermanent = true;
     }
 
     fallback() external payable {

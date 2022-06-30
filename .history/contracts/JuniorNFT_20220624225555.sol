@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract JuniorNFT is IJuniorNFT, ERC721A, Ownable, ReentrancyGuard {
     
+    bool private isRevealed;
+    bool public isPermanent;
     address public Admin;
     uint256 private mintingFee;
     uint256 public maxQuantity = 5;
@@ -71,7 +73,9 @@ contract JuniorNFT is IJuniorNFT, ERC721A, Ownable, ReentrancyGuard {
         return baseURI;
     }
 
-    function setBaseURI(string memory _newBaseURI) external onlyOwnerOrAdmin {
+    function setBaseURI(string memory _newBaseURI) external onlyOwner {
+        if (isPermanent) revert ImmutableState();
+        
         baseURI = _newBaseURI;
         emit BaseURIUpdated(_newBaseURI);
     }
@@ -91,6 +95,15 @@ contract JuniorNFT is IJuniorNFT, ERC721A, Ownable, ReentrancyGuard {
 
     function getMinintgFee() public view returns(uint256) {
         return mintingFee;
+    }
+
+    function setRevealed() public onlyOwnerOrAdmin {
+        isRevealed = true;
+        emit Revealed();
+    }
+
+    function setPermanent() external onlyOwner {
+        isPermanent = true;
     }
 
     fallback() external payable {
