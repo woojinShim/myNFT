@@ -1,14 +1,11 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  const JuniorNFT = await ethers.getContractFactory("JuniorNFT");
-  const contract = await JuniorNFT.deploy(
-    "http://baseURI",
-    "http://defaultURI"
-  );
+  const MyNFT = await ethers.getContractFactory("MyNFT");
+  const contract = await MyNFT.deploy("http://baseURI", "http://defaultURI");
   await contract.deployed();
 
-  console.log("JuniorNFT deployed to:", contract.address);
+  console.log("MyNFT deployed to:", contract.address);
 }
 
 main().catch((error) => {
